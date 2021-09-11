@@ -56,8 +56,11 @@ tongmia = '《臺灣客家語常用詞辭典》內容資料(1100430).csv'
 def uann(lomaji, pio):
     for tat, hing in pio.items():
         pattern = r'([a-z]+)' + tat + r'(?![\d])'
-        repl = r'\1' + hing
-        lomaji = re.sub(pattern, repl, lomaji)
+        lomaji = re.sub(
+            pattern,
+            lambda match: match.group(1) + hing,
+            lomaji
+        )
     return lomaji
 
 
