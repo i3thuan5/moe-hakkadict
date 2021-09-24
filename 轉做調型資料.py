@@ -53,6 +53,15 @@ tongmia = '《臺灣客家語常用詞辭典》內容資料(1100430).csv'
     '43': 'ˋ',
 }
 
+造字表 = {
+    '\ue72c': '𫟧',  # U+2B7E7
+    '\ue0c7': '𫠛',  # U+2B81B
+    '\ue711': '𫝘',  # U+2B758
+    '\ue700': '𫣆',  # U+2B8C6
+    '\ue725': '𬠖',  # U+2C816
+    '\ue76f': '⿺皮卜',  # 還無Unicode
+}
+
 
 def uann(lomaji, pio):
     for tat, hing in pio.items():
@@ -65,6 +74,13 @@ def uann(lomaji, pio):
     return lomaji
 
 
+def biang_zosii(row_dict):
+    for col in row_dict:
+        for k, v in 造字表.items():
+            row_dict[col] = row_dict[col].replace(k, v)
+    return row_dict
+
+
 def main():
     with open(Path(__file__).parent / '調值資料' / tongmia) as guanpun:
         with open(Path(__file__).parent / '調型資料' / tongmia, 'w') as sin:
@@ -72,6 +88,7 @@ def main():
             writer = csv.DictWriter(sin, fieldnames=reader.fieldnames)
             writer.writeheader()
             for row in reader:
+                row = biang_zosii(row)
                 row['四縣腔音讀'] = uann(row['四縣腔音讀'], 四縣聲調表)
                 row['南四縣腔音讀'] = uann(row['南四縣腔音讀'], 四縣聲調表)
                 row['南四縣相關字詞音讀'] = uann(row['南四縣相關字詞音讀'], 四縣聲調表)
