@@ -82,7 +82,7 @@ def biang_zosii(row_dict):
 
 
 def main():
-    with open(Path(__file__).parent / '調值資料' / tongmia) as guanpun:
+    with open(Path(__file__).parent / '調值資料_raw' / tongmia) as guanpun:
         with open(Path(__file__).parent / '調型資料' / tongmia, 'w') as sin:
             reader = csv.DictReader(guanpun)
             writer = csv.DictWriter(sin, fieldnames=reader.fieldnames)
@@ -99,6 +99,15 @@ def main():
                 row['饒平腔相關字詞音讀'] = uann(row['饒平腔相關字詞音讀'], 饒平聲調表)
                 row['詔安腔音讀'] = uann(row['詔安腔音讀'], 詔安聲調表)
                 row['詔安腔相關字詞音讀'] = uann(row['詔安腔相關字詞音讀'], 詔安聲調表)
+                writer.writerow(row)
+
+    with open(Path(__file__).parent / '調值資料_raw' / tongmia) as guanpun:
+        with open(Path(__file__).parent / '調值資料_uni' / tongmia, 'w') as sin:
+            reader = csv.DictReader(guanpun)
+            writer = csv.DictWriter(sin, fieldnames=reader.fieldnames)
+            writer.writeheader()
+            for row in reader:
+                row = biang_zosii(row)
                 writer.writerow(row)
 
 
