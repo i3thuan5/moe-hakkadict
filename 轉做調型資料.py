@@ -87,13 +87,8 @@ def biang_zosii(row_dict):
     for col in row_dict:
         for k, v in 造字表.items():
             row_dict[col] = row_dict[col].replace(k, v)
-        pitui = re.findall(r'[\uE000-\uF8FF]', row_dict[col])
-        if pitui:
-            for ji in pitui:
-                pianbe = hex(ord(ji))
-                print(f'有造字字元，編碼是{pianbe}')
-            continue
         for ji in row_dict[col]:
+            pianbe = hex(ord(ji))
             if unicodedata.category(ji) == 'Co':
                 print(f'有造字字元，編碼{pianbe}')
     return row_dict
