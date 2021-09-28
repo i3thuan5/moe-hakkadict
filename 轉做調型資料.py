@@ -1,5 +1,6 @@
 import csv
 import re
+import unicodedata
 from pathlib import Path
 
 tongmia = '《臺灣客家語常用詞辭典》內容資料(1100430).csv'
@@ -53,6 +54,23 @@ tongmia = '《臺灣客家語常用詞辭典》內容資料(1100430).csv'
     '43': 'ˋ',
 }
 
+造字表 = {
+    '\ue72c': '𫟧',  # U+2B7E7
+    '\ue0c7': '𫠛',  # U+2B81B
+    '\ue711': '𫝘',  # U+2B758
+    '\ue700': '𫣆',  # U+2B8C6
+    '\ue725': '𬠖',  # U+2C816
+    '\ue76f': '⿺皮卜',  # 無Unicode
+    # 下底是近反義詞才有出現--ê，對應豆腐烏外字表ê「客語教典PUA」欄
+    '\uf354': '䞚',  # U+479A
+    '\uf369': '𧊅',  # U+27285
+    '\uf36e': '𧩣',  # U+27A63
+    '\uf36f': '𩜰',  # U+29730
+    '\uf374': '𢯭',  # U+22BED
+    '\uf3b9': '𥉌',  # U+2524C
+    '\uf545': '⿺皮卜',  # 無Unicode
+}
+
 
 def uann(lomaji, pio):
     for tat, hing in pio.items():
@@ -65,13 +83,25 @@ def uann(lomaji, pio):
     return lomaji
 
 
+def biang_zosii(row_dict):
+    for col in row_dict:
+        for k, v in 造字表.items():
+            row_dict[col] = row_dict[col].replace(k, v)
+        for ji in row_dict[col]:
+            pianbe = hex(ord(ji))
+            if unicodedata.category(ji) == 'Co':
+                print(f'有造字字元，編碼{pianbe}')
+    return row_dict
+
+
 def main():
-    with open(Path(__file__).parent / '調值資料' / tongmia) as guanpun:
+    with open(Path(__file__).parent / '調值資料_raw' / tongmia) as guanpun:
         with open(Path(__file__).parent / '調型資料' / tongmia, 'w') as sin:
             reader = csv.DictReader(guanpun)
             writer = csv.DictWriter(sin, fieldnames=reader.fieldnames)
             writer.writeheader()
             for row in reader:
+                row = biang_zosii(row)
                 row['四縣腔音讀'] = uann(row['四縣腔音讀'], 四縣聲調表)
                 row['南四縣腔音讀'] = uann(row['南四縣腔音讀'], 四縣聲調表)
                 row['南四縣相關字詞音讀'] = uann(row['南四縣相關字詞音讀'], 四縣聲調表)
@@ -82,6 +112,15 @@ def main():
                 row['饒平腔相關字詞音讀'] = uann(row['饒平腔相關字詞音讀'], 饒平聲調表)
                 row['詔安腔音讀'] = uann(row['詔安腔音讀'], 詔安聲調表)
                 row['詔安腔相關字詞音讀'] = uann(row['詔安腔相關字詞音讀'], 詔安聲調表)
+                writer.writerow(row)
+
+    with open(Path(__file__).parent / '調值資料_raw' / tongmia) as guanpun:
+        with open(Path(__file__).parent / '調值資料_uni' / tongmia, 'w') as sin:
+            reader = csv.DictReader(guanpun)
+            writer = csv.DictWriter(sin, fieldnames=reader.fieldnames)
+            writer.writeheader()
+            for row in reader:
+                row = biang_zosii(row)
                 writer.writerow(row)
 
 
